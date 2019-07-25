@@ -1,235 +1,315 @@
 /*!
  * Cube v3.1.14-beta.3
  */
-(function(a, b) {
-    function c() {}
-    function d(a, b) {
-        if (1 === arguments.length)
-            return j(a);
-        var c = j(a);
-        return l.css(c, b, a),
-        a
+(function (globalObject, CubeName) {
+  function emptyFn() {} //empty fn
+
+  function d(a, b) {
+    if (1 === arguments.length) return j(a);
+    Cube.css(j(a), b, a)
+    return a
+  }
+
+  function e(a) {
+    return function (b, c, d) {
+      if (2 === arguments.length && 'function' === typeof c) {
+        d = c
+        c = null
+        Cube.use(b, a, d)
+      } else {
+        Cube.use(b, a, function (a) {
+          a = Cube.css(a, c, b),
+            d && d(a)
+        })
+      }
     }
-    function e(a) {
-        return function(b, c, d) {
-            2 === arguments.length && 'function' === typeof c ? (d = c,
-            c = null,
-            l.use(b, a, d)) : l.use(b, a, function(a) {
-                a = l.css(a, c, b),
-                d && d(a)
+  }
+
+  function f(a) {
+    var b = a.indexOf ? a.indexOf(":") : 0;
+    return 0 < b ? q[a.substr(0, b)] + a.substr(b + 1) : ''
+  }
+
+  function g(a) {
+    for (var maxLength = a.length, i = 0; i < maxLength; i++) {
+      var b = a[i]
+      if (-1 === b.indexOf(":")) {
+        if (0 === b.indexOf('./')) {
+          a[i] = b.substr(1)
+        } else if ('/' !== b[0]) {
+          a[i] = '/' + b
+        }
+      }
+    }
+    return a
+  }
+
+  function h() {
+    if (D.length) return false;
+    for (var a in A) {
+      if (A.hasOwnProperty(a)) {
+        return false;
+      }
+    }
+    return true
+  }
+
+  function i(a, ref) {
+    //a 模块 list
+    //b ref
+    'string' === typeof a && (a = [a]);
+    if (initState) {
+      a.forEach(function (a) {
+        if (!modules[a]) {
+          var c = document.createElement('script');
+          c.type = 'text/javascript'
+          c.async = 'true'
+          c.charset = charset
+          c.onerror = () => {
+            l(a, [], () => {
+              console.error(`load module: ${a} failed.`)
             })
-        }
-    }
-    function f(a) {
-        var b = a.indexOf ? a.indexOf(s) : 0;
-        return 0 < b ? q[a.substr(0, b)] + a.substr(b + 1) : ''
-    }
-    function g(a) {
-        for (var b, c = a.length, d = 0; d < c; d++)
-            b = a[d],
-            -1 === b.indexOf(s) && (0 === b.indexOf('./') ? a[d] = b.substr(1) : '/' !== b[0] && (a[d] = '/' + b));
-        return a
-    }
-    function h() {
-        if (D.length)
-            return !1;
-        for (var a in A)
-            if (A.hasOwnProperty(a))
-                return !1;
-        return !0
-    }
-    function i(a, b) {
-        return 'string' === typeof a && (a = [a]),
-        C ? void (a.forEach(function(a) {
-            if (!z[a]) {
-                var c = o.createElement('script');
-                c.type = 'text/javascript',
-                c.async = 'true',
-                c.charset = t,
-                c.onerror = ()=>{
-                    l(a, [], ()=>{
-                        console.error(`load module: ${a} failed.`)
-                    }
-                    )
-                }
-                ;
-                var d = f(a)
-                  , e = d || r + a
-                  , g = [];
-                m && g.push(m),
-                v && (g.push('m'),
-                g.push('ref=' + b)),
-                c.src = g.length ? e + '?' + g.join('&') : e,
-                B.appendChild(c),
-                z[a] = {
-                    exports: {},
-                    loaded: !1,
-                    fired: !1
-                },
-                A[a] = !0
-            }
-        }),
-        h() && k()) : void D.push([a, b])
-    }
-    function j(b) {
-        function c() {
-            var c = z[b];
-            if (!c)
-                throw new Error('Cube Error: Cannot find module \'' + b + '\'');
-            return c.fired || (c.fired = !0,
-            c.exports = c.fn.apply(a, [c, c.exports, d, e(b), x, y])),
-            c.exports
-        }
-        if (u)
-            return c();
-        try {
-            return c()
-        } catch (a) {
-            return p.error(a),
-            {}
-        }
-    }
-    function k() {
-        var a, b;
-        for (a in w)
-            w.hasOwnProperty(a) && (b = a.split(','),
-            b.forEach(function(b) {
-                var c = 0;
-                j(b),
-                w[a].forEach(function(a) {
-                    var d = a(z[b].exports);
-                    d && c++
-                }),
-                w[a].length === c && delete w[a]
-            }))
-    }
-    function l(a, b, c) {
-        z[a] || (z[a] = {
+          };
+          var d = f(a),
+            e = d || r + a,
+            g = [];
+          version && g.push(version)
+          debug && (g.push('m'), g.push('ref=' + ref))
+          c.src = g.length ? e + '?' + g.join('&') : e
+          document.querySelector('head').appendChild(c)
+          modules[a] = {
             exports: {},
-            loaded: !1,
-            fired: !1
-        });
-        var d = z[a];
-        d.fn = c,
-        d.loaded = !0,
-        delete A[a],
-        i(b, a)
-    }
-    var m, n = window, o = document, p = console, r = '', q = {}, s = ':', t = 'utf-8', u = !0, v = !0, w = {}, x = {
-        env: {
-            NODE_ENV: 'production'
+            loaded: false,
+            fired: false
+          }
+          A[a] = true
         }
-    }, y = void 0, z = {}, A = {}, B = o.querySelector('head'), C = !1, D = [];
-    l.toString = function() {
-        return 'Cube:v3.1.14-beta.3'
+      })
+      return h() && k()
+    } else {
+      return void D.push([a, ref])
     }
-    ,
-    l.init = function(a) {
-        if (a.base && '/' !== a.base && (r = a.base.replace(/\/$/, '')),
-        a.remoteBase)
-            for (var b in a.remoteBase)
-                a.remoteBase.hasOwnProperty(b) && (q[b] = a.remoteBase[b].replace(/\/$/, ''));
-        for (a.charset && (t = a.charset),
-        a.version && (m = a.version),
-        void 0 !== a.debug && (v = a.debug),
-        void 0 !== a.strict && (u = a.strict),
-        a.env && (x.env.NODE_ENV = a.env),
-        a.global && (y = a.global),
-        C = !0; D.length; ) {
-            var c = D.shift();
-            i(c[0], c[1])
-        }
-        return this
+
+  }
+
+  function j(moduleName) {
+    function c() {
+      var c = modules[moduleName];
+      if (!c) throw new Error('Cube Error: Cannot find module \'' + moduleName + '\'');
+      if (c.fired) {
+        c.fired = true
+        c.exports = c.fn.apply(global, [c, c.exports, d, e(moduleName), x, global])
+      }
+      return c.exports;
     }
-    ,
-    l.use = function(b, d, e, f) {
-        if (!b)
-            throw new Error('Cube.use(moduleName) moduleName is undefined!');
-        return 'function' === typeof d && (f = e,
-        e = d,
-        d = void 0),
-        d || (d = 'Cube.use'),
-        e = e || c,
-        'string' === typeof b && (b = [b]),
-        f || (b = g(b)),
-        w[b] || (w[b] = []),
-        w[b].push(function() {
-            var c = []
-              , d = b.length
-              , f = !1;
-            return function(b) {
-                if (!f)
-                    return (c.push(b),
-                    c.length === d) ? (f = !0,
-                    e.apply(a, c),
-                    !0) : void 0
+    if (strict) return c();
+    try {
+      return c()
+    } catch (a) {
+      console.error(a)
+      return {}
+    }
+  }
+
+  function k() {
+    var a, b;
+    for (a in w) {
+      if (w.hasOwnProperty(a)) {
+        b = a.split(',')
+        b.forEach(function (b) {
+          var c = 0;
+          j(b)
+          w[a].forEach(function (a) {
+            var d = a(modules[b].exports);
+            d && c++
+          })
+          w[a].length === c && delete w[a]
+        })
+      }
+    }
+
+  }
+
+  function Cube(moduleName, moduleList, callback) {
+    // moduleName
+    // 依赖名字
+    // callback
+    modules[moduleName] || (modules[moduleName] = { //初始化
+      exports: {},
+      loaded: false,
+      fired: false
+    });
+    var d = modules[moduleName];
+    d.fn = callback
+    d.loaded = true
+    delete A[moduleName]
+    i(moduleList, moduleName)
+  }
+  var version,
+    r = '',
+    q = {},
+    charset = 'utf-8',
+    strict = true,
+    debug = true,
+    w = {},
+    x = {
+      env: {
+        NODE_ENV: 'production'
+      }
+    },
+    global = void 0,
+    modules = {},
+    A = {},
+    initState = false,
+    D = [];
+  Cube.toString = function () {
+    return 'Cube:v3.1.14-beta.3'
+  }
+  Cube.init = function (config) {
+    config.base && '/' !== config.base && (r = config.base.replace(/\/$/, ''))
+    if (config.remoteBase) {
+      for (var b in config.remoteBase) {
+        config.remoteBase.hasOwnProperty(b) && (q[b] = config.remoteBase[b].replace(/\/$/, ''));
+      }
+    }
+
+    config.charset && (charset = config.charset)
+    config.version && (version = config.version)
+    void 0 !== config.debug && (debug = config.debug)
+    void 0 !== config.strict && (strict = config.strict)
+    config.env && (x.env.NODE_ENV = config.env)
+    config.global && (global = config.global)
+    initState = true;
+    while (D.length) {
+      var c = D.shift();
+      i(c[0], c[1])
+    }
+    return this
+  }
+  Cube.use = function (moduleName, d, e, f) {
+    /*
+      b  moduleName
+      d  calback
+      e  
+      f  
+      c 空函数
+    */
+    if (!moduleName) {
+      throw new Error('Cube.use(moduleName) moduleName is undefined!');
+    } else {
+      if ('function' === typeof d) {
+        f = e,
+          e = d,
+          d = undefined
+      }
+
+      d || (d = 'Cube.use')
+      e = e || emptyFn
+
+      'string' === typeof moduleName && (moduleName = [moduleName]) // 路径转化
+
+      f || (moduleName = g(moduleName))
+
+      w[moduleName] || (w[moduleName] = [])
+
+      w[moduleName].push(function () {
+          var c = [],
+            d = moduleName.length,
+            f = false;
+          return function (b) {
+            if (!f) {
+              c.push(b)
+              if (c.length === d) {
+                f = true,
+                  e.apply(global, c);
+                return true
+              }
             }
+          }
         }()),
-        i(b, d),
-        this
+        i(moduleName, d);
+      return this
     }
-    ,
-    l.register = function(a, b) {
-        return z[a] ? p.error('Cube Error: Module \'' + a + '\' already registered') : (z[a] = {
-            exports: b,
-            fn: c,
-            loaded: !0,
-            fired: !0
-        },
-        this)
+  }
+  Cube.register = function (moduleName, exportObject) {
+    if (modules[moduleName]) {
+      console.error('Cube Error: Module \'' + moduleName + '\' already registered')
+    } else {
+      modules[moduleName] = {
+        exports: exportObject,
+        fn: emptyFn,
+        loaded: true,
+        fired: true
+      }
+      return this
     }
-    ;
-    var E = /([^};]+)(\{[^}]+\})/g
-      , F = {};
-    l.css = function(a, b, c) {
-        if (a) {
-            var d = c + '@' + b;
-            if (!F[d]) {
-                F[d] = !0,
-                b && (a = a.replace(E, function(a, c, d) {
-                    var e = c.split(',').map(function(a) {
-                        return b + ' ' + a.trim()
-                    });
-                    return e.join(',') + d
-                }));
-                var e = o.createElement('style');
-                return e.setAttribute('type', 'text/css'),
-                e.setAttribute('mod', c),
-                b && e.setAttribute('ns', b),
-                B.appendChild(e),
-                e.innerHTML = a,
-                a
-            }
+  };
+  var F = {};
+  Cube.css = function (cssText, ns, mod) {
+    if (cssText) {
+      var d = mod + '@' + ns;
+      if (!F[d]) {
+        F[d] = true
+        if (ns) {
+          cssText = cssText.replace(/([^};]+)(\{[^}]+\})/g, function (a, c, d) {
+            var e = c.split(',').map(function (a) {
+              return ns + ' ' + a.trim()
+            });
+            return e.join(',') + d
+          })
         }
+        var e = document.createElement('style');
+        e.setAttribute('type', 'text/css')
+        e.setAttribute('mod', mod)
+        ns && e.setAttribute('ns', ns)
+        document.querySelector('head').appendChild(e)
+        e.innerHTML = cssText
+        return cssText;
+      }
     }
-    ,
-    l.debug = function() {
-        n.localStorage && n.addEventListener ? (localStorage.cube = 'debug',
-        location.reload()) : p.error('Cube Error: Cannot debug, your browser does not support localStorage or addEventListener')
+  }
+  Cube.debug = function () {
+    if (window.localStorage && window.addEventListener) {
+      localStorage.cube = 'debug'
+      location.reload()
+    } else {
+      console.error('Cube Error: Cannot debug, your browser does not support localStorage or addEventListener')
     }
-    ,
-    l.cache = function() {
-        var a, b, c = {}, d = {};
-        for (a in z)
-            z.hasOwnProperty(a) && (b = z[a],
-            b.loaded || (c[a] = b),
-            b.fired || (d[a] = b));
-        p.info('modules:', z),
-        p.info('unloaded:', c),
-        p.info('unfired:', d)
+  }
+  Cube.cache = function () {
+    var unloaded = {};
+    var unfired = {};
+    for (var a in modules) {
+      if (modules.hasOwnProperty(a)) {
+        var b = modules[a]
+        b.loaded || (unloaded[a] = b)
+        b.fired || (unfired[a] = b)
+      }
     }
-    ,
-    n.localStorage && 'debug' === localStorage.cube && (v = !0,
-    n.addEventListener('load', l.cache)),
-    b = b || 'Cube',
-    a[b] ? p.error('Cube Error: window.' + b + ' already in using, replace the last "null" param in cube.js') : a[b] = l;
-    var G = o.currentScript;
-    if (G) {
-        var H = G.dataset;
-        H.base && (l.init(H),
-        l.use(H.main || 'index.js', function(a) {
-            a.run && a.run()
-        }))
+    console.info('modules:', modules)
+    console.info('unloaded:', unloaded)
+    console.info('unfired:', unfired)
+  }
+  if (window.localStorage && 'debug' === localStorage.cube) {
+    debug = true
+    window.addEventListener('load', Cube.cache)
+  }
+  CubeName = CubeName || 'Cube'
+  globalObject[CubeName] = Cube
+  if (globalObject[CubeName]) {
+    console.error('Cube Error: window.' + CubeName + ' already in using, replace the last "null" param in cube.js')
+  } else {
+    globalObject[CubeName] = Cube
+  }
+
+  var currentScript = document.currentScript;
+  if (currentScript) {
+    var dataset = currentScript.dataset;
+    if (dataset.base) {
+      Cube.init(dataset)
+      Cube.use(dataset.main || 'index.js', function (a) {
+        a.run && a.run()
+      })
     }
-}
-)(window, null);
+  }
+})(window, null);
